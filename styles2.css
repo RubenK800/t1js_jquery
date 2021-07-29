@@ -1,0 +1,31 @@
+*    { font-family: 'Roboto Mono', monospace; margin: 0; }
+body { 
+	max-width: 750px; 
+	margin: 0 auto; 
+	padding: 1em; 
+}
+#form{
+	text-align: center;
+}
+input:not([type=submit]), select { 
+	background: white; 
+	padding: .5em 1em; 
+	border: 1px solid black; 
+}
+select, button, input[type=submit] { 
+	cursor: pointer; 
+}
+button, input[type=submit] { 
+	padding: .5em 1em; 
+	background: white; 
+	border: 1px solid black; 
+}
+button:hover, input[type=submit]:hover { 
+	background: #ccc; 
+}
+#output { 
+	text-align: center; 
+	padding: 1em; 
+}
+#output > span { font-size: 4em; display: block; }
+

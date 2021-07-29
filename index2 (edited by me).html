@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8">
+        <title>Find the day of the week</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="styles2.css">
+		<link rel="stylesheet" href="styleForModalScreen.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="form">
+            <form onsubmit="event.preventDefault();">
+                <select id="1" name="year" required>
+				    <option value="-">Ընտրել տարին</option>
+				</select>
+                <select id ="2" name="month" required style="display:none">
+                    <option value="-">Ընտրել ամիսը</option>
+                    <option value="January">Հունվար</option>
+                    <option value="February">Փետրվար</option>
+                    <option value="March">Մարտ</option>
+                    <option value="April">Ապրիլ</option>
+                    <option value="May">Մայիս</option>
+                    <option value="June">Հունիս</option>
+                    <option value="July">Հուլիս</option>
+                    <option value="August">Օգոստոս</option>
+                    <option value="September">Սեպտեմբեր</option>
+                    <option value="October">Հոկտեմբեր</option>
+                    <option value="November">Նոյեմբեր</option>
+                    <option value="December">Դեկտեմբեր</option>
+                </select>
+                <select id = "3" name="day" required style="display:none">
+                    <option value="-">Ընտրել օրը</option>
+                </select>
+                <input id = "4" type="submit" value="Հաստատել" style="display:none">
+            </form>
+        </div>
+
+		<div class="modalScreen-fade" hidden>
+			<div class="modalScreen">
+				<a class="modalScreen-close" href="#">X</a>
+				<!-- <p id = "5">Hello Everybody!</p> -->
+				<div id="5"><div>
+			</div>
+		</div>
+        <script>			
+			let day = document.querySelector("form select[name=day]");
+            let month = document.querySelector("form select[name=month]");
+            let year = document.querySelector("form select[name=year]");
+			let neededYears = 2050;
+			let submit = document.getElementById(4);
+
+            let yearsSelected;
+  			let monthsSelected;
+  			let daysSelected;
+
+			//для расчета разницы времени
+			let tNow;
+			let tSelected;
+			
+			let timeDiff;
+			
+			let leftYears;
+			let leftMonths;
+			let leftDays;
+            let leftHours;
+			let leftMinutes;
+			let leftSeconds;
+			
+			let currentYearValue = 0;
+			let count1;
+			
+			let elapsedYears;
+			let elapsedMonths;
+			let elapsedDays;
+			let elapsedHours; 
+			let elapsedMinutes;
+			let elapsedSeconds;
+
+            eventListenersAddToSelectionDateFields();
+            
+			submit.addEventListener('click', function(){				
+				if(year.value==="-" || month.value==="-" || day.value==="-"){
+					alert("you didn't choose all the necessary fields, please do it to continue");
+				} else if(year.value!="-" && month.value!="-" && day.value!="-"){
+				activateTheModalScreenFunctions();
+				//setTimer
+				openTheModalWindow();
+				//without this calc the result will be displayed only after the first 1000 millis elapse
+				calcAndDisplayTheTimeDiff();
+				setInterval(function(){
+					calcAndDisplayTheTimeDiff();
+				},1000);							
+			}});
+
+
+
+			function createYearsList(){
+			   year.innerHTML = "<option value='-'>Ընտրել տարին</option>" + makeArrayOfYears(neededYears).map(el => "<option value='" + el + "'>" + el + "</option>").join("");
+			}
+
+			createYearsList();
+
+
+            function updateDay() {
+			    //ниже формулой можно создать дополнительные элементы для любого select options!
+				//доп.  innerHTML командой мы изменяем содержимое между тегами :), потом найдем способ менять содержимое между вложенными тегами, то есть тегами, которые находятся между других тегов.
+                day.innerHTML = "<option value='-'>Ընտրել օրը</option>" + (makeArr1x(getNumberOfDaysMonth(month.value, (isLeapYear(year.value) ? 1 : 0))).map(el => "<option value='" + el + "'>" + el + "</option>").join(""));
+            }
+
+			function showStuff(id) {
+				//new version by jQuery 
+				$('#'+id).show();
+			}
+
+			function hideStuff(id){
+				//new version by jQuery 
+				$('#'+id).hide(); 
+			}
+
+            function isLeapYear(x) {
+                return (x % 4 == 0 && (x % 100 != 0 || x % 400 == 0));
+            }
+
+			function makeArrayOfYears(x) {
+				let years = [];
+                for(i = x; i >= 1; --i) years.push(i);
+                return years;
+            }
+
+            function makeArr1x(x) {
+				let toret = [];
+                for(i = 1; i <= x; ++i) toret.push(i);
+                return toret;
+            }
+
+            function getNumberOfDaysMonth(x, isleap = 0) {
+                return {
+                    "January": 31,
+                    "February": 28 + isleap,
+                    "March": 31,
+                    "April": 30,
+                    "May": 31,
+                    "June": 30,
+                    "July": 31,
+                    "August": 31,
+                    "September": 30,
+                    "October": 31,
+                    "November": 30,
+                    "December": 31
+                }[x];
+            }
+
+			function getMonthValue(x) {
+                return {
+                    "January": 00,
+                    "February": 01,
+                    "March": 02,
+                    "April": 03,
+                    "May": 04,
+                    "June": 05,
+                    "July": 06,
+                    "August": 07,
+                    "September": 08,
+                    "October": 09,
+                    "November": 10,
+                    "December": 11
+                }[x];
+            }
+			
+			function leftDaysInit(){
+				leftDays = Math.floor(timeDiff/(1000*60*60*24));
+			}
+			
+			function leftHoursInit(){
+				leftHours = Math.floor((timeDiff%(1000*60*60*24))/(1000*60*60));
+			}
+			
+			function leftMinutesInit(){
+				leftMinutes = Math.floor((timeDiff%(1000*60*60))/(1000*60));
+			}
+			
+			function leftSecondsInit(){
+				leftSeconds = Math.floor((timeDiff%(1000*60))/1000);
+			}
+			
+			function leftYearsInit(){
+				leftYears = Math.floor(leftDays/365);
+			}
+			
+			function leftMonthsInit(){
+				leftMonths = Math.floor(leftDays/30);
+			}
+			
+			function getTheLeapYearsCount(){
+				let forCycleStart;
+				let forCycleEnd;
+				if(yearsSelected<currentYearValue){
+					forCycleStart = yearsSelected;
+				    forCycleEnd = currentYearValue;
+				}else{
+					forCycleStart = currentYearValue;
+					forCycleEnd = yearsSelected;
+				}  
+				
+				for(let i = forCycleStart; i<=forCycleEnd; i++){
+					if(i%4 == 0 && (i%100 != 0 || i%400 == 0)){
+				        //this if() statement is very important
+						if(tSelected.getMonth>=0 && tSelected.getMonth()<2 || tNow.getMonth()>=0 && tNow.getMonth()<2){
+						}else{
+							++count1;
+						}
+					}
+				}
+			}
+			
+			function selectedDateInit(){
+				yearsSelected=year.value;
+			    monthsSelected=getMonthValue(month.value);
+			    daysSelected=day.value;
+			    tSelected = new Date(yearsSelected,monthsSelected,daysSelected, 0, 0, 0, 0);
+			}
+			
+			function eventListenersAddToSelectionDateFields(){
+				month.addEventListener("input", updateDay);
+				year.addEventListener("input", updateDay);
+
+				year.addEventListener('change', function() {
+					if(this.value!="-"){
+						showStuff(2);
+					} else if(this.value="-"){
+						if(month.value==="-"){
+							hideStuff(2);
+						}
+				}}, false);
+
+				month.addEventListener('change', function() {
+					if(this.value!="-"){
+						showStuff(3);
+					} else if(this.value="-"){
+						if(day.value==="-"){
+							hideStuff(3);
+						}
+				}}, false);
+
+				day.addEventListener('change', function() {
+					if(this.value!="-"){
+						showStuff(4);
+					}
+				}, false);
+			}
+			
+			function timeDiffInit(){
+				timeDiff = tSelected.getTime() - tNow.getTime();
+			}
+			
+			function initLeftTimeFromSecondsToDay(){
+				leftDaysInit();
+                leftHoursInit();
+				leftMinutesInit();
+				leftSecondsInit();
+			}
+			
+			function disableLeapYearsEffectLeft(){
+				leftDays-=count1;
+			}
+			
+			function disableLeapYearsEffectElapsed(){
+				elapsedDays-=count1;
+			}
+			
+			function elapsedDaysInit(){
+				return Math.floor(timeDiff/(1000*60*60*24));
+			}
+			
+			function elapsedHoursInit(){
+				return Math.floor((timeDiff%(1000*60*60*24))/(1000*60*60));
+			}
+			
+			function elapsedMinutesInit(){
+				return Math.floor((timeDiff%(1000*60*60))/(1000*60));
+			}
+			
+			function elapsedSecondsInit(){
+				return Math.floor((timeDiff%(1000*60))/1000);
+			}
+			
+			function elapsedYearsInit(){
+				elapsedYears = Math.floor(elapsedDays/365);
+			}
+			
+			function elapsedMonthsInit(){
+				elapsedMonths = Math.floor(elapsedDays/30);
+			}
+			
+			function initElapsedTimeFromSecondsToDay(){
+				elapsedDays = elapsedDaysInit();
+                elapsedHours = elapsedHoursInit();
+				elapsedMinutes = elapsedMinutesInit();
+				elapsedSeconds = elapsedSecondsInit();
+			}
+			
+			function displayLeftTimeToUser(){				
+				//new version by jQuery
+				$("#5").html("<br>Մնացել է " + leftYears+ " տարի "+leftMonths+ " ամիս " + leftDays +
+					" օր " + leftHours + " ժ. " +leftMinutes+" ր. "+leftSeconds+" վ.");
+			}
+			
+			function displayElapsedTimeToUser(){
+                //new version by jQuery 			
+				$("#5").html("<br>Անցել է " + elapsedYears+ " տարի "+elapsedMonths+ " ամիս " + elapsedDays +
+					" օր " + elapsedHours + " ժ. " +elapsedMinutes+" ր. "+elapsedSeconds+" վ.");
+			}
+			
+			function tNowInit(){
+				tNow = new Date();
+			}
+			
+			function fixBugsForLeftTime(){
+				if(leftMonths != 0){
+					if(((leftDays/30)%10) != 0){
+						leftDays+=1;
+					}
+					leftDays-=leftMonths*30 +5;
+					if(leftMonths == 12){
+						++leftYears; leftMonths = 0;
+					}
+				}
+				
+				if(leftHours!=0 || leftMinutes!=0 || leftSeconds!=0){
+					if(leftYears > 0 && leftMonths == 0 && leftDays == 0){
+						--leftYears;
+						leftMonths = 11;
+						leftDays = 29;
+					}else if(leftYears>=0 && leftMonths > 0 && leftDays == 0){
+						--leftMonths;
+						leftDays = 29;
+					}else if(leftYears>=0 && leftMonths>=0 && leftDays > 0){
+						--leftDays;
+					}else if(leftYears==0 && leftMonths==0 && leftDays == 0){
+					}
+				}
+			}
+			
+			function fixLeftDaysValueByYears(){
+				leftDays -= leftYears*365;
+			}
+			
+			function currentYearValueInit(){
+				currentYearValue = tNow.getFullYear();
+			}
+			
+			function fixTheTimeDiff(){
+				timeDiff = Math.abs(timeDiff);
+			}
+			
+			function fixElapsedDaysValueByYears(){
+				elapsedDays -= elapsedYears*365;
+			}
+			
+			function fixElapsedDaysValueByMonths(){
+				elapsedDays-=elapsedMonths*30;
+			}
+			
+			function fixBugsForElapsedTime(){
+				if(elapsedMonths == 12){
+					++elapsedYears; elapsedMonths = 0;
+				}
+			}
+			
+			function openTheModalWindow(){
+				$(".modalScreen-fade").show();
+			}
+			
+			function activateTheModalScreenFunctions(){
+				$(document).ready(function($) {
+					// Клик по ссылке "Закрыть".
+					$('.modalScreen-close').click(function() {
+						$(this).parents('.modalScreen-fade').fadeOut();
+						return false;
+					});        
+
+					// Закрытие по клавише Esc.
+					$(document).keydown(function(e) {
+						if (e.keyCode === 27) {
+							e.stopPropagation();
+							$('.modalScreen-fade').fadeOut();
+						}
+					});
+
+					// Клик по фону, но не по окну.
+					/*$('.modalScreen-fade').click(function(e) {
+						if ($(e.target).closest('.modalScreen').length == 0) {
+							$(this).fadeOut();					
+						}
+					});*/	
+				});
+			}
+			
+			function calcAndDisplayTheTimeDiff(){
+				tNowInit();
+				selectedDateInit();
+				timeDiffInit();
+					
+				count1 = 0;
+                     
+                if(timeDiff>=0){
+					currentYearValueInit();
+					getTheLeapYearsCount();
+					initLeftTimeFromSecondsToDay();
+					disableLeapYearsEffectLeft();
+					leftYearsInit();
+					fixLeftDaysValueByYears();
+					leftMonthsInit();
+					fixBugsForLeftTime();						
+					displayLeftTimeToUser();
+				}else if(timeDiff<0){
+					count1 = 0;
+					fixTheTimeDiff();
+					initElapsedTimeFromSecondsToDay();
+					currentYearValueInit();
+					getTheLeapYearsCount();						 
+					elapsedYearsInit();
+					fixElapsedDaysValueByYears();
+					elapsedMonthsInit();
+					fixElapsedDaysValueByMonths();
+					//disableLeapYearsEffectElapsed();
+					fixBugsForElapsedTime();
+					displayElapsedTimeToUser();
+				}
+			}
+			
+        </script>
+    </body>
+</html>
